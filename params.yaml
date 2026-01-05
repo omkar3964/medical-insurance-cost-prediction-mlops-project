@@ -1,0 +1,10 @@
+data_ingestion:
+  test_size : 0.20
+  required_columns:
+    - age
+    - gender
+    - bmi
+    - bloodpressure
+    - diabetic
+    - children
+    - smoker
