@@ -128,3 +128,19 @@ def save_model(model, file_path: str) -> None:
     except Exception as e:
         logger.exception("Failed to save model at %s", file_path)
         raise
+
+
+
+def load_model(file_path: str):
+    """Load the trained model from a file."""
+    try:
+        with open(file_path, 'rb') as file:
+            model = joblib.load(file)
+        logger.info('Model loaded from %s', file_path)
+        return model
+    except FileNotFoundError:
+        logger.error('File not found: %s', file_path)
+        raise
+    except Exception as e:
+        logger.error('Unexpected error occurred while loading the model: %s', e)
+        raise

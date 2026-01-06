@@ -2,7 +2,7 @@ import logging
 from src.logger import configure_logger
 from sklearn.ensemble import GradientBoostingRegressor
 import pandas as pd
-from src.utils import load_params
+from src.utils import load_params, load_data
 from src.utils import save_model
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def main():
         logger.info("loading model_building parameter\n")
         params = load_params(params_path='params.yaml')
         training_params = params['model_building']['parameters']
-        train_data = pd.read_csv('./data/processed/train.csv')
+        train_data = load_data('./data/processed/train.csv')
 
         model = train_model(GradientBoostingRegressor, training_params, train_data)
 
