@@ -211,3 +211,7 @@ __marimo__/
 # man
 local_s3
 ./data
+data/
+models/
+reports/
+.dvc/cache/

@@ -6,6 +6,7 @@ from src.logger import configure_logger
 from src.utils import load_params, load_data, save_data
 
 # Configure logger
+configure_logger()
 logger = logging.getLogger(__name__)
 
 
@@ -51,7 +52,7 @@ def main():
         test_size = params['data_ingestion']['test_size']
         required_columns = params['data_ingestion']['required_columns']
         
-        df = load_data('notebooks\insurance.csv')
+        df = load_data(Path("notebooks") / "insurance.csv")
         validate_columns(df, required_columns)
 
         train_data, test_data = train_test_split(df, test_size=test_size, random_state=42)

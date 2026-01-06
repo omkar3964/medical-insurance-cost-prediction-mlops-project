@@ -1,0 +1,30 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data/data_ingestion.py
+    deps:
+    - path: notebooks/insurance.csv
+      hash: md5
+      md5: 3d80b1e2d0b3f849d777ccc59193245a
+      size: 67615
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: 7fbf5725bb6c8e8569a44909ad20bc91
+      size: 2384
+    params:
+      params.yaml:
+        data_ingestion.required_columns:
+        - age
+        - gender
+        - bmi
+        - bloodpressure
+        - diabetic
+        - children
+        - smoker
+        data_ingestion.test_size: 0.2
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 4d41104d12fd5d1e06fbd1898396b99e.dir
+      size: 69027
+      nfiles: 2
