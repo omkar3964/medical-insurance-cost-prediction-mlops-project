@@ -2,6 +2,7 @@ import yaml
 from pathlib import Path
 import pandas as pd
 import logging
+import joblib
 logger = logging.getLogger(__name__)
 
 
@@ -82,7 +83,6 @@ def load_data(data_path: str, file_type: str = "csv") -> pd.DataFrame:
         raise
 
 
-
 def save_data(df: pd.DataFrame, folder_path: str, file_name: str) -> Path:
     """
     Save a DataFrame to a CSV file in the specified folder. Creates the folder if it doesn't exist.
@@ -111,4 +111,20 @@ def save_data(df: pd.DataFrame, folder_path: str, file_name: str) -> Path:
 
     except Exception as e:
         logger.exception("Failed to save data to %s/%s: %s", folder_path, file_name, e)
+        raise
+
+
+
+def save_model(model, file_path: str) -> None:
+    """Save the trained model to disk using joblib."""
+    try:
+        file_path = Path(file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        joblib.dump(model, file_path)
+
+        logger.info("Model successfully saved at %s", file_path)
+
+    except Exception as e:
+        logger.exception("Failed to save model at %s", file_path)
         raise

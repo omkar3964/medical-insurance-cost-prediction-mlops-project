@@ -6,7 +6,6 @@ from src.logger import configure_logger
 from src.utils import load_params, load_data, save_data
 
 # Configure logger
-configure_logger()
 logger = logging.getLogger(__name__)
 
 
@@ -43,22 +42,30 @@ def validate_columns(df: pd.DataFrame, required_columns: list) -> None:
 
 
 def main():
-    logger.info("started data_ingestion pipeline.....................\n")
-
-    params = load_params(params_path = "params.yaml")
-    test_size = params['data_ingestion']['test_size']
-    required_columns = params['data_ingestion']['required_columns']
-    
-    df = load_data('notebooks\insurance.csv')
-    validate_columns(df, required_columns)
-
-    train_data, test_data = train_test_split(df, test_size=test_size, random_state=42)
-
-    train_path = save_data(train_data, "data/raw", "train.csv")
-    test_path = save_data(test_data, "data/raw", "test.csv")
+    try:
 
 
-    logger.info("completed data_ingestion  pipeline.....................\n")
+        logger.info("started data_ingestion pipeline.....................\n")
+
+        params = load_params(params_path = "params.yaml")
+        test_size = params['data_ingestion']['test_size']
+        required_columns = params['data_ingestion']['required_columns']
+        
+        df = load_data('notebooks\insurance.csv')
+        validate_columns(df, required_columns)
+
+        train_data, test_data = train_test_split(df, test_size=test_size, random_state=42)
+
+        train_path = save_data(train_data, "data/raw", "train.csv")
+        test_path = save_data(test_data, "data/raw", "test.csv")
+        logger.info("raw data saved at %s and %s", train_path, test_path)
+
+        logger.info("completed data_ingestion  pipeline.....................\n")
+
+
+    except Exception as e:
+        logging.error('Failed to complete the data ingestion process: %s', e)
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     main()

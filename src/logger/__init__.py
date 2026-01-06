@@ -8,18 +8,20 @@ LOG_FILE = "app.log"
 MAX_LOG_SIZE = 5 * 1024 * 1024  # 5 MB
 BACKUP_COUNT = 3
 
+
 def configure_logger():
     """
     Configure logging for the entire project.
-    Call this once at the entry point (e.g., main.py or data_ingestion.py).
+    This function is safe to call multiple times.
     """
 
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)
 
-    # Avoid adding duplicate handlers
-    if root_logger.hasHandlers():
+    # IMPORTANT: configure only once
+    if root_logger.handlers:
         return
+
+    root_logger.setLevel(logging.DEBUG)
 
     os.makedirs(LOG_DIR, exist_ok=True)
     log_file_path = os.path.join(LOG_DIR, LOG_FILE)
@@ -28,7 +30,7 @@ def configure_logger():
         "[%(asctime)s] %(name)s - %(levelname)s - %(message)s"
     )
 
-    # File handler (rotates logs)
+    # File handler
     file_handler = RotatingFileHandler(
         log_file_path,
         maxBytes=MAX_LOG_SIZE,
@@ -45,3 +47,7 @@ def configure_logger():
 
     root_logger.addHandler(file_handler)
     root_logger.addHandler(console_handler)
+
+
+#  AUTO-CONFIGURE ON IMPORT
+configure_logger()
