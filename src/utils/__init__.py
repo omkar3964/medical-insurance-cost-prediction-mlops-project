@@ -3,6 +3,9 @@ from pathlib import Path
 import pandas as pd
 import logging
 import joblib
+from src.logger import configure_logger
+configure_logger()
+
 logger = logging.getLogger(__name__)
 
 
@@ -112,6 +115,9 @@ def save_data(df: pd.DataFrame, folder_path: str, file_name: str) -> Path:
     except Exception as e:
         logger.exception("Failed to save data to %s/%s: %s", folder_path, file_name, e)
         raise
+
+
+
 
 
 

@@ -9,8 +9,8 @@ stages:
       size: 67615
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: 7fbf5725bb6c8e8569a44909ad20bc91
-      size: 2384
+      md5: 1f45c83cfff3ae53fb2988d5eec89c59
+      size: 2295
     params:
       params.yaml:
         data_ingestion.required_columns:
@@ -23,8 +23,131 @@ stages:
         - smoker
         data_ingestion.test_size: 0.2
     outs:
-    - path: data/raw
+    - path: data/raw/test.csv
       hash: md5
-      md5: 4d41104d12fd5d1e06fbd1898396b99e.dir
-      size: 69027
-      nfiles: 2
+      md5: 398991990def784a672988e1267c9213
+      size: 13876
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 71da543c85b8c992ecac3927624c69f0
+      size: 55151
+  data_preprocessing:
+    cmd: python src/data/data_preprocessing.py
+    deps:
+    - path: data/raw/test.csv
+      hash: md5
+      md5: 398991990def784a672988e1267c9213
+      size: 13876
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 71da543c85b8c992ecac3927624c69f0
+      size: 55151
+    - path: src/data/data_preprocessing.py
+      hash: md5
+      md5: ddd338f3171873927db3365e35258daf
+      size: 3505
+    params:
+      params.yaml:
+        data_preprocessing.features:
+        - age
+        - gender
+        - bmi
+        - bloodpressure
+        - diabetic
+        - children
+        - smoker
+        data_preprocessing.num_cols:
+        - age
+        - bmi
+        - bloodpressure
+        data_preprocessing.outliers:
+        - bmi
+        - bloodpressure
+        data_preprocessing.target: claim
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 5f9210e1bca7aaa651c064478f387673
+      size: 20442
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 6db3404bc3978faae951d90208548527
+      size: 80930
+    - path: models/scaler.pkl
+      hash: md5
+      md5: f301614f0ed67e1774161a726761647e
+      size: 911
+  model_building:
+    cmd: python src/model/model_building.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 6db3404bc3978faae951d90208548527
+      size: 80930
+    - path: models/scaler.pkl
+      hash: md5
+      md5: f301614f0ed67e1774161a726761647e
+      size: 911
+    - path: src/model/model_building.py
+      hash: md5
+      md5: bd54d5582e2ba990a8c17e4964812fe2
+      size: 1934
+    params:
+      params.yaml:
+        model_building.parameters.learning_rate: 0.05
+        model_building.parameters.max_depth: 3
+        model_building.parameters.n_estimators: 100
+        model_building.parameters.subsample: 1.0
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: e2ee6ccd8a851578a2f9cdb96c4b4e87
+      size: 138076
+  model_evaluation:
+    cmd: python src/model/model_evaluation.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 5f9210e1bca7aaa651c064478f387673
+      size: 20442
+    - path: models/model.pkl
+      hash: md5
+      md5: e2ee6ccd8a851578a2f9cdb96c4b4e87
+      size: 138076
+    - path: src/model/model_evaluation.py
+      hash: md5
+      md5: f1fb42e6a1bcd593055bfc9c082f9d2b
+      size: 3577
+    outs:
+    - path: reports/experiment_info.json
+      hash: md5
+      md5: 8491a0a1f82728ac3407cacc31237bc6
+      size: 121
+    - path: reports/metrics.json
+      hash: md5
+      md5: b1d41ec09737158db349fa91d4b34c41
+      size: 97
+  model_registration:
+    cmd: python src/model/register_model.py
+    deps:
+    - path: models/model.pkl
+      hash: md5
+      md5: e2ee6ccd8a851578a2f9cdb96c4b4e87
+      size: 138076
+    - path: reports/experiment_info.json
+      hash: md5
+      md5: 8491a0a1f82728ac3407cacc31237bc6
+      size: 121
+    - path: reports/metrics.json
+      hash: md5
+      md5: b1d41ec09737158db349fa91d4b34c41
+      size: 97
+    - path: src/model/register_model.py
+      hash: md5
+      md5: 2fa7792488a94e974a6601cf40526fbd
+      size: 4879
+    params:
+      params.yaml:
+        register_model.ACCEPTANCE_CRITERIA.max_rmse: 5500
+        register_model.ACCEPTANCE_CRITERIA.min_r2: 0.8
+        register_model.MODEL_NAME: InsuranceCostRegressor

@@ -1,3 +1,5 @@
+
+
 stages:
   data_ingestion:
     cmd: python src/data/data_ingestion.py
@@ -10,28 +12,29 @@ stages:
     outs:
       - data/raw/train.csv
       - data/raw/test.csv
-      
-
 
   data_preprocessing:
-      cmd: python src/data/data_preprocessing.py
-      deps:
-        - src/data/data_preprocessing.py
-        - data/raw
-      params:
-        - data_preprocessing.features
-        - data_preprocessing.target
-        - data_preprocessing.outliers
-        - data_preprocessing.num_cols
-      outs:
-        - data/processed
-        - models/scaler.pkl
+    cmd: python src/data/data_preprocessing.py
+    deps:
+      - src/data/data_preprocessing.py
+      - data/raw/train.csv
+      - data/raw/test.csv
+    params:
+      - data_preprocessing.features
+      - data_preprocessing.target
+      - data_preprocessing.outliers
+      - data_preprocessing.num_cols
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - models/scaler.pkl
 
   model_building:
     cmd: python src/model/model_building.py
     deps:
       - src/model/model_building.py
       - data/processed/train.csv
+      - models/scaler.pkl
     params:
       - model_building.parameters.learning_rate
       - model_building.parameters.max_depth
@@ -40,11 +43,10 @@ stages:
     outs:
       - models/model.pkl
 
-
   model_evaluation:
-    cmd: python src/model/evaluate_model.py
+    cmd: python src/model/model_evaluation.py
     deps:
-      - src/model/evaluate_model.py
+      - src/model/model_evaluation.py
       - models/model.pkl
       - data/processed/test.csv
     outs:
@@ -55,8 +57,8 @@ stages:
     cmd: python src/model/register_model.py
     deps:
       - src/model/register_model.py
-      - reports/experiment_info.json
       - reports/metrics.json
+      - reports/experiment_info.json
       - models/model.pkl
     params:
       - register_model.MODEL_NAME
