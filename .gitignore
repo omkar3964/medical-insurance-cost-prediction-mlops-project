@@ -208,10 +208,17 @@ __marimo__/
 
 
 
-# man
-local_s3
-./data
-data/
+# Ignore raw and processed data contents
+data/raw/
+data/processed/
+
+# Allow DVC metadata files
+!data/*.dvc
+
+# DVC cache
+.dvc/cache/
+
+# Other project folders
 models/
 reports/
-.dvc/cache/
+local_s3

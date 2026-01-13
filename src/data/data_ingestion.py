@@ -4,10 +4,20 @@ from sklearn.model_selection import train_test_split
 import logging
 from src.logger import configure_logger
 from src.utils import load_params, load_data, save_data
+from src.connections import s3_connection
+from dotenv import load_dotenv
+import os
+
+
 
 # Configure logger
 configure_logger()
 logger = logging.getLogger(__name__)
+
+load_dotenv()
+BUCKET_NAME = os.getenv("AWS_BUCKET_NAME")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 
 def validate_columns(df: pd.DataFrame, required_columns: list) -> None:
@@ -43,7 +53,8 @@ def main():
         required_columns = params['data_ingestion']['required_columns']
 
         # Load dataset
-        df = load_data(Path("notebooks") / "insurance.csv")
+        s3 = s3_connection.s3_operations(BUCKET_NAME,    AWS_ACCESS_KEY_ID,    AWS_SECRET_ACCESS_KEY)
+        df = s3.fetch_file_from_s3("insurance.csv")
         validate_columns(df, required_columns)
 
         # Split dataset
