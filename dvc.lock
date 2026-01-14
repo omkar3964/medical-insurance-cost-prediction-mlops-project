@@ -5,72 +5,149 @@ stages:
     deps:
     - path: data/processed/train.csv
       hash: md5
-      md5: 1563ccf41a4dad0528630a9c86cc45fe
-      size: 76000
+      md5: 6db3404bc3978faae951d90208548527
+      size: 80930
     - path: models/scaler.pkl
       hash: md5
-      md5: 3d336a59aa004f7d061d8a22264e6975
+      md5: f301614f0ed67e1774161a726761647e
       size: 911
     - path: src/model/model_building.py
       hash: md5
-      md5: bd54d5582e2ba990a8c17e4964812fe2
-      size: 1934
+      md5: 87bbfbc8637b1566750d7e173e00a869
+      size: 1940
     params:
       params.yaml:
-        model_building.parameters.learning_rate: 0.06
+        model_building.parameters.learning_rate: 0.05
         model_building.parameters.max_depth: 3
         model_building.parameters.n_estimators: 100
         model_building.parameters.subsample: 1.0
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: 7fc846f29b06b60497aad63e4295c8df
+      md5: e2ee6ccd8a851578a2f9cdb96c4b4e87
       size: 138076
   model_evaluation:
     cmd: python src/model/model_evaluation.py
     deps:
     - path: data/processed/test.csv
       hash: md5
-      md5: bc8653e353c20ce3d317a6591548749a
-      size: 25638
+      md5: 5f9210e1bca7aaa651c064478f387673
+      size: 20442
     - path: models/model.pkl
       hash: md5
-      md5: 7fc846f29b06b60497aad63e4295c8df
+      md5: e2ee6ccd8a851578a2f9cdb96c4b4e87
       size: 138076
     - path: src/model/model_evaluation.py
       hash: md5
-      md5: f1fb42e6a1bcd593055bfc9c082f9d2b
-      size: 3577
+      md5: ea32e783a4ac5ac0f4a480be5cfcb8a1
+      size: 3721
     outs:
     - path: reports/experiment_info.json
       hash: md5
-      md5: f93593909859566f6ae2889728956d9e
+      md5: 94be7bdc81388965feb4dc111d56dd8a
       size: 121
     - path: reports/metrics.json
       hash: md5
-      md5: 0787cb971dc2f55fc0d2abe5b924ede3
+      md5: b1d41ec09737158db349fa91d4b34c41
       size: 97
   model_registration:
     cmd: python src/model/register_model.py
     deps:
     - path: models/model.pkl
       hash: md5
-      md5: 7fc846f29b06b60497aad63e4295c8df
+      md5: e2ee6ccd8a851578a2f9cdb96c4b4e87
       size: 138076
     - path: reports/experiment_info.json
       hash: md5
-      md5: f93593909859566f6ae2889728956d9e
+      md5: 94be7bdc81388965feb4dc111d56dd8a
       size: 121
     - path: reports/metrics.json
       hash: md5
-      md5: 0787cb971dc2f55fc0d2abe5b924ede3
+      md5: b1d41ec09737158db349fa91d4b34c41
       size: 97
     - path: src/model/register_model.py
       hash: md5
-      md5: 2fa7792488a94e974a6601cf40526fbd
-      size: 4879
+      md5: 970ecef9cc058dc83baf414f008d8140
+      size: 4883
     params:
       params.yaml:
-        register_model.ACCEPTANCE_CRITERIA.max_rmse: 5400
+        register_model.ACCEPTANCE_CRITERIA.max_rmse: 5300
         register_model.ACCEPTANCE_CRITERIA.min_r2: 0.8
-        register_model.MODEL_NAME: InsuranceCostRegressor
+        register_model.MODEL_NAME: InsuranceCostModel
+  data_ingestion:
+    cmd: python src/data/data_ingestion.py
+    deps:
+    - path: notebooks/insurance.csv
+      hash: md5
+      md5: 3d80b1e2d0b3f849d777ccc59193245a
+      size: 67615
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: 8f708fdbe16f4f3edbf506f60b6228ec
+      size: 2653
+    params:
+      params.yaml:
+        data_ingestion.required_columns:
+        - age
+        - gender
+        - bmi
+        - bloodpressure
+        - diabetic
+        - children
+        - smoker
+        data_ingestion.test_size: 0.2
+    outs:
+    - path: data/raw/test.csv
+      hash: md5
+      md5: 398991990def784a672988e1267c9213
+      size: 13876
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 71da543c85b8c992ecac3927624c69f0
+      size: 55151
+  data_preprocessing:
+    cmd: python src/data/data_preprocessing.py
+    deps:
+    - path: data/raw/test.csv
+      hash: md5
+      md5: 398991990def784a672988e1267c9213
+      size: 13876
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 71da543c85b8c992ecac3927624c69f0
+      size: 55151
+    - path: src/data/data_preprocessing.py
+      hash: md5
+      md5: 1d56116f91ed87ec349d7c430b946ade
+      size: 3509
+    params:
+      params.yaml:
+        data_preprocessing.features:
+        - age
+        - gender
+        - bmi
+        - bloodpressure
+        - diabetic
+        - children
+        - smoker
+        data_preprocessing.num_cols:
+        - age
+        - bmi
+        - bloodpressure
+        data_preprocessing.outliers:
+        - bmi
+        - bloodpressure
+        data_preprocessing.target: claim
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 5f9210e1bca7aaa651c064478f387673
+      size: 20442
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 6db3404bc3978faae951d90208548527
+      size: 80930
+    - path: models/scaler.pkl
+      hash: md5
+      md5: f301614f0ed67e1774161a726761647e
+      size: 911

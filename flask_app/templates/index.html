@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Insurance Predictor</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 20px 25px;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            width: 420px;
+            max-width: 95%;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        label {
+            font-weight: 600;
+            margin-top: 15px;
+            display: block;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 6px rgba(106, 17, 203, 0.4);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Result box */
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f3f6ff;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            border-left: 5px solid #6a11cb;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            input, select, button {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>Insurance Cost Prediction</h2>
+
+    <form method="POST" action="/predict">
+        <label>Age</label>
+        <input type="number" name="age" placeholder="Enter age (e.g., 35)" min="1" max="100" required>
+
+        <label>Gender</label>
+        <select name="gender" required>
+            <option value="" disabled selected>Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+
+        <label>BMI</label>
+        <input type="number" name="bmi" placeholder="BMI (10 – 60)" step="0.1" min="10" max="60" required>
+
+        <label>Blood Pressure (Systolic)</label>
+        <input type="number" name="bloodpressure" placeholder="e.g., 120" min="60" max="200" required>
+
+        <label>Diabetic</label>
+        <select name="diabetic" required>
+            <option value="" disabled selected>Are you diabetic?</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+
+        <label>Children</label>
+        <input type="number" name="children" placeholder="Number of children" min="0" max="10" required>
+
+        <label>Smoker</label>
+        <select name="smoker" required>
+            <option value="" disabled selected>Do you smoke?</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+
+        <button type="submit">Predict Insurance Cost</button>
+    </form>
+
+    {% if result %}
+        <div class="result">
+            Predicted Insurance Cost: $ {{ result }}
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>

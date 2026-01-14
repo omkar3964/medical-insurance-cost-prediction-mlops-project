@@ -1,0 +1,57 @@
+name: CI-CD MLOps Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  project-testing:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # 3. Upgrade pip
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      # 4. Cache pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # 5. Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install dvc[s3] mlflow
+
+      # 6. Show project structure (debug)
+      - name: List project files
+        run: |
+          pwd
+          ls -R
+      
+      # 7. Run DVC pipeline
+      - name: Run DVC pipeline
+        env:
+          # CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          dvc repro

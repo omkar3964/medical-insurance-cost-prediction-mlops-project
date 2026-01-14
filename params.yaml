@@ -1,5 +1,5 @@
 data_ingestion:
-  test_size : 0.25
+  test_size : 0.20
   required_columns:
     - age
     - gender
@@ -29,14 +29,14 @@ data_preprocessing:
 
 model_building:
   parameters:
-    learning_rate: 0.06
+    learning_rate: 0.05
     max_depth: 3
     n_estimators: 100
     subsample: 1.0
 
 register_model:
-  MODEL_NAME: InsuranceCostRegressor
+  MODEL_NAME: InsuranceCostModel
   ACCEPTANCE_CRITERIA:
     min_r2: 0.80
-    max_rmse: 5400
+    max_rmse: 5300
 

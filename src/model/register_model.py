@@ -11,13 +11,16 @@ from mlflow.exceptions import MlflowException
 logger = logging.getLogger(__name__)
 
 
+# local 
 mlflow.set_tracking_uri('https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow')
 dagshub.init(repo_owner='omalbhare', repo_name='medical-insurance-cost-prediction-mlops-project', mlflow=True)
 
+# production 
+
+
+
+
 client = MlflowClient()
-
-
-
 
 # -------------------------------
 # Utility Functions
@@ -146,3 +149,5 @@ def main():
     
 if __name__ == "__main__":
     main()
+
+

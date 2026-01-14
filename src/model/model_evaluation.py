@@ -8,8 +8,13 @@ import numpy as np
 import json
 logger = logging.getLogger(__name__)
 
+
+# local 
 mlflow.set_tracking_uri('https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow')
 dagshub.init(repo_owner='omalbhare', repo_name='medical-insurance-cost-prediction-mlops-project', mlflow=True)
+
+# production 
+
 
 def save_metrics(metrics: dict, file_path: str) -> None:
     """Save the evaluation metrics to a JSON file."""
@@ -54,6 +59,8 @@ def main():
     with mlflow.start_run() as run:
         try:
             model = load_model('models/model.pkl')
+            model = load_model('models/model.pkl')
+
             test_data = load_data('data/processed/test.csv')
 
             X_test = test_data.iloc[:, :-1]
@@ -79,6 +86,8 @@ def main():
                     mlflow.log_param(param_name, param_value)
 
             mlflow.sklearn.log_model(model, "model")
+            mlflow.log_artifact("models/scaler.pkl", artifact_path="preprocessor")
+
             save_model_info(run.info.run_id, f"runs:/{run.info.run_id}/model",  "reports/experiment_info.json")
 
 
@@ -91,3 +100,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
