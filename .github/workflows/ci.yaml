@@ -49,7 +49,7 @@ jobs:
       # 7. Run DVC pipeline
       - name: Run DVC pipeline
         env:
-          # CAPSTONE_TEST: ${{ secrets.CAPSTONE_TEST }}
+          DAGSHUB_TOKEN_HEALTH: ${{ secrets.DAGSHUB_TOKEN_HEALTH }}
           AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
