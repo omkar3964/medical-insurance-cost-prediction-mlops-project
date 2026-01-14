@@ -1,4 +1,5 @@
 import json
+import os
 import mlflow
 import logging
 from mlflow.tracking import MlflowClient
@@ -11,11 +12,22 @@ from mlflow.exceptions import MlflowException
 logger = logging.getLogger(__name__)
 
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # local 
-mlflow.set_tracking_uri('https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow')
-dagshub.init(repo_owner='omalbhare', repo_name='medical-insurance-cost-prediction-mlops-project', mlflow=True)
+# mlflow.set_tracking_uri('https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow')
+# dagshub.init(repo_owner='omalbhare', repo_name='medical-insurance-cost-prediction-mlops-project', mlflow=True)
 
 # production 
+dagshub_token = os.getenv("DAGSHUB_TOKEN_HEALTH")
+if not dagshub_token:
+    raise EnvironmentError("DAGSHUB_TOKEN_HEALTH environment variable is not set")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+mlflow.set_tracking_uri('https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow')
+
 
 
 
