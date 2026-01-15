@@ -1,5 +1,5 @@
 import unittest
-import json
+from unittest.mock import patch
 from flask_app.app import app
 
 
@@ -7,21 +7,26 @@ class TestFlaskApp(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Create Flask test client once for all tests
-        """
         app.testing = True
         cls.client = app.test_client()
 
-    # 1️ Home Route Test
+    # 1 Home Route Test
     def test_home_page_loads(self):
         response = self.client.get("/")
-
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Insurance", response.data)  # Adjust keyword if needed
+        self.assertIn(b"Insurance", response.data)
 
-    # 2️ Prediction Route Test
-    def test_prediction_endpoint(self):
+    # 2 Prediction Route Test (MOCKED)
+    @patch("flask_app.app.load_artifacts")
+    @patch("flask_app.app.model")
+    @patch("flask_app.app.scaler")
+    def test_prediction_endpoint(self, mock_scaler, mock_model, mock_load_artifacts):
+        # Mock scaler
+        mock_scaler.transform.return_value = [[0.1, 0.2, 0.3]]
+
+        # Mock model prediction
+        mock_model.predict.return_value = [12345.67]
+
         payload = {
             "age": "30",
             "gender": "male",
@@ -35,9 +40,9 @@ class TestFlaskApp(unittest.TestCase):
         response = self.client.post("/predict", data=payload)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Result", response.data)  # HTML contains prediction
+        self.assertIn(b"12345", response.data)
 
-    # 3️ Metrics Endpoint Test
+    # 3 Metrics Endpoint Test
     def test_metrics_endpoint(self):
         response = self.client.get("/metrics")
 
