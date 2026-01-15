@@ -55,3 +55,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           dvc repro
+
+      # 8. Run model test
+      - name: Run model tests
+        env :          
+          DAGSHUB_TOKEN_HEALTH: ${{ secrets.DAGSHUB_TOKEN_HEALTH }}
+        run: |
+          python -m unittest tests/test_model.py
+
