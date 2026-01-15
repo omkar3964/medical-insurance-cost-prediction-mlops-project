@@ -16,9 +16,7 @@ class TestInsuranceCostModel(unittest.TestCase):
         os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
         os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
-        mlflow.set_tracking_uri(
-            "https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow"
-        )
+        mlflow.set_tracking_uri("https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow")
 
         cls.model_name = "InsuranceCostModel"
         cls.model_version = cls.get_latest_model_version(cls.model_name)

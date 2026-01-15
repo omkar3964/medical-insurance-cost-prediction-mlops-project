@@ -38,7 +38,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install dvc[s3] mlflow
 
       # 6. Show project structure (debug)
       - name: List project files
@@ -58,8 +57,14 @@ jobs:
 
       # 8. Run model test
       - name: Run model tests
-        env :          
+        env:          
           DAGSHUB_TOKEN_HEALTH: ${{ secrets.DAGSHUB_TOKEN_HEALTH }}
         run: |
           python -m unittest tests/test_model.py
 
+      # 9. Run flask app test
+      - name: Run Flask app tests
+        env:          
+          DAGSHUB_TOKEN_HEALTH: ${{ secrets.DAGSHUB_TOKEN_HEALTH }}
+        run: |
+          python -m unittest tests/test_flask_app.py
