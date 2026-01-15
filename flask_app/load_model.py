@@ -6,14 +6,8 @@ def load_model_and_scaler(model_name: str, stage: str = "Production"):
     Load MLflow pyfunc model and scaler artifact
     """
     try:
-        mlflow.set_tracking_uri(
-            "https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow"
-        )
-        dagshub.init(
-            repo_owner="omalbhare",
-            repo_name="medical-insurance-cost-prediction-mlops-project",
-            mlflow=True,
-        )
+        mlflow.set_tracking_uri( "https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow"     )
+        dagshub.init(repo_owner="omalbhare",repo_name="medical-insurance-cost-prediction-mlops-project", mlflow=True, )
 
         # Load model
         model_uri = f"models:/{model_name}/{stage}"

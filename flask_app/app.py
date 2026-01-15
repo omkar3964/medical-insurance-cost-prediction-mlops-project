@@ -4,9 +4,8 @@ import numpy as np
 import pandas as pd
 from flask import Flask, render_template, request
 from prometheus_client import Counter, Histogram, CollectorRegistry, generate_latest, CONTENT_TYPE_LATEST
-import mlflow
-import dagshub
-from load_model import load_model_and_scaler
+# from load_model import load_model_and_scaler
+from .load_model import load_model_and_scaler
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
