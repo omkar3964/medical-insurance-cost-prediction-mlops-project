@@ -69,7 +69,6 @@ def main():
     with mlflow.start_run() as run:
         try:
             model = load_model('models/model.pkl')
-            model = load_model('models/model.pkl')
 
             test_data = load_data('data/processed/test.csv')
 
