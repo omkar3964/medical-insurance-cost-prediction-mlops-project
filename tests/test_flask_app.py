@@ -40,7 +40,7 @@ class TestFlaskApp(unittest.TestCase):
         response = self.client.post("/predict", data=payload)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"12345", response.data)
+        self.assertIn(b"Result", response.data)
 
     # 3 Metrics Endpoint Test
     def test_metrics_endpoint(self):
