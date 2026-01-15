@@ -1,3 +1,4 @@
+import os
 import dagshub
 import mlflow
 import joblib
@@ -6,8 +7,18 @@ def load_model_and_scaler(model_name: str, stage: str = "Production"):
     Load MLflow pyfunc model and scaler artifact
     """
     try:
-        mlflow.set_tracking_uri( "https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow"     )
-        dagshub.init(repo_owner="omalbhare",repo_name="medical-insurance-cost-prediction-mlops-project", mlflow=True, )
+        # local 
+        # mlflow.set_tracking_uri('https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow')
+        # dagshub.init(repo_owner='omalbhare', repo_name='medical-insurance-cost-prediction-mlops-project', mlflow=True)
+
+        # production 
+        dagshub_token = os.getenv("DAGSHUB_TOKEN_HEALTH")
+        if not dagshub_token:
+            raise EnvironmentError("DAGSHUB_TOKEN_HEALTH environment variable is not set")
+
+        os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+        os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+        mlflow.set_tracking_uri('https://dagshub.com/omalbhare/medical-insurance-cost-prediction-mlops-project.mlflow')
 
         # Load model
         model_uri = f"models:/{model_name}/{stage}"

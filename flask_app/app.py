@@ -1,6 +1,4 @@
-import joblib
 import time
-import numpy as np
 import pandas as pd
 from flask import Flask, render_template, request
 from prometheus_client import Counter, Histogram, CollectorRegistry, generate_latest, CONTENT_TYPE_LATEST
@@ -27,14 +25,9 @@ PREDICTION_LATENCY = Histogram("model_prediction_latency_seconds", "Latency of r
 
 # Load at startup
 MODEL_NAME = "InsuranceCostModel"
-model = None
-scaler = None
+model, scaler = load_model_and_scaler(MODEL_NAME, stage="Production")
 
-
-def load_artifacts():
-    global model, scaler
-    if model is None or scaler is None:
-        model, scaler = load_model_and_scaler(MODEL_NAME, stage="Production")
+        
 
 
 
@@ -78,7 +71,6 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    load_artifacts() 
     start_time = time.time()
     REQUEST_COUNT.labels(method="POST", endpoint="/predict").inc()
 

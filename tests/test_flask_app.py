@@ -1,34 +1,41 @@
+import os
 import unittest
-from unittest.mock import patch
+
 from flask_app.app import app
 
 
 class TestFlaskApp(unittest.TestCase):
+    """
+    Integration tests for Flask app with real MLflow model + scaler.
+    """
 
     @classmethod
     def setUpClass(cls):
+        # Ensure DAGSHUB token exists
+        if not os.getenv("DAGSHUB_TOKEN_HEALTH"):
+            raise EnvironmentError(
+                "DAGSHUB_TOKEN_HEALTH environment variable is required for tests"
+            )
+
         app.testing = True
         cls.client = app.test_client()
 
-    # 1 Home Route Test
-    def test_home_page_loads(self):
+    # -----------------------
+    # Home page
+    # -----------------------
+    def test_home_page(self):
         response = self.client.get("/")
+
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Insurance", response.data)
+        self.assertIn(b"Insurance Cost Prediction", response.data)
+        self.assertIn(b"Predict Insurance Cost", response.data)
 
-    # 2 Prediction Route Test (MOCKED)
-    @patch("flask_app.app.load_artifacts")
-    @patch("flask_app.app.model")
-    @patch("flask_app.app.scaler")
-    def test_prediction_endpoint(self, mock_scaler, mock_model, mock_load_artifacts):
-        # Mock scaler
-        mock_scaler.transform.return_value = [[0.1, 0.2, 0.3]]
-
-        # Mock model prediction
-        mock_model.predict.return_value = [12345.67]
-
+    # -----------------------
+    # Prediction endpoint
+    # -----------------------
+    def test_prediction_endpoint(self):
         payload = {
-            "age": "30",
+            "age": "35",
             "gender": "male",
             "bmi": "24.5",
             "bloodpressure": "120",
@@ -40,15 +47,27 @@ class TestFlaskApp(unittest.TestCase):
         response = self.client.post("/predict", data=payload)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Result", response.data)
 
-    # 3 Metrics Endpoint Test
+        # Ensure prediction rendered
+        self.assertIn(b"Predicted Insurance Cost", response.data)
+
+        # Ensure error not shown
+        self.assertNotIn(b"Error:", response.data)
+
+    # -----------------------
+    # Metrics endpoint
+    # -----------------------
     def test_metrics_endpoint(self):
         response = self.client.get("/metrics")
 
         self.assertEqual(response.status_code, 200)
+
+        # Validate actual metric names defined in app.py
         self.assertIn(b"app_request_total", response.data)
+        self.assertIn(b"app_request_latency_seconds", response.data)
         self.assertIn(b"model_prediction_total", response.data)
+        self.assertIn(b"model_prediction_latency_seconds", response.data)
+        self.assertIn(b"model_prediction_value", response.data)
 
 
 if __name__ == "__main__":
