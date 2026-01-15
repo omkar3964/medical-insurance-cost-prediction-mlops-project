@@ -99,7 +99,7 @@ class TestInsuranceCostModel(unittest.TestCase):
 
         y_pred = self.model.predict(X_processed)
 
-        rmse = mean_squared_error(y_test, y_pred, squared=False)
+        rmse = np.sqrt(mean_squared_error(y_test, y_pred))
         mae = mean_absolute_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
 
