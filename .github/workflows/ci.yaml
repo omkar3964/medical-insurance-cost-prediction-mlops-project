@@ -115,5 +115,5 @@ jobs:
       # 17. Deploy Flask ML app to EKS
       - name: Deploy to EKS
         run: |
-          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f deployment.yaml
           kubectl rollout status deployment/flask-ml-app
