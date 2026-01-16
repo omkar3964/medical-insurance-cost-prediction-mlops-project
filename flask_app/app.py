@@ -59,7 +59,7 @@ def prepare_input_features(form_data, scaler):
 
 
 
-# Routes
+# following routes
 @app.route("/")
 def home():
     start_time = time.time()
