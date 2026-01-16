@@ -69,7 +69,7 @@ jobs:
         run: |
           python -m unittest tests/test_flask_app.py
 
-      
+      # 10. Login to AWS ECR
       - name: Login to AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
         env:
@@ -77,12 +77,43 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     
-
+      # 11. Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA} .
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest .
 
+      # 12. Push Docker image to ECR
       - name: Push Docker image to ECR
         run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${GITHUB_SHA}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
+      # 13. Configure AWS CLI for EKS// eks starting
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 14. Set up kubectl
+      - name: Set Up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # 15. Update kubeconfig to access EKS cluster
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name health-insurance-flask-app-cluster
+
+      # 16. Create Kubernetes Secret
+      - name: Create Kubernetes Secret
+        run: |
+          kubectl create secret generic dagshub-secret \
+            --from-literal=DAGSHUB_TOKEN_HEALTH=${{ secrets.DAGSHUB_TOKEN_HEALTH }} --dry-run=client -o yaml | kubectl apply -f -
+
+      # 17. Deploy Flask ML app to EKS
+      - name: Deploy to EKS
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl rollout status deployment/flask-ml-app

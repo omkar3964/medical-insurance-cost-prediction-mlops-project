@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-ml-app
+  labels:
+    app: flask-ml-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-ml-app
+  template:
+    metadata:
+      labels:
+        app: flask-ml-app
+    spec:
+      containers:
+        - name: flask-ml-app
+          image: 969608025474.dkr.ecr.us-east-1.amazonaws.com/medicalinsuranceimg:latest
+
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DAGSHUB_TOKEN_HEALTH
+              valueFrom:
+                secretKeyRef:
+                  name: dagshub-secret      # Kubernetes Secret name
+                  key: DAGSHUB_TOKEN_HEALTH # Key inside the secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-ml-service
+  labels:
+    app: flask-ml-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: flask-ml-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
