@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 app = Flask(__name__)
 
 
-# Prometheus Metrics
+# Prometheus Metric
 registry = CollectorRegistry()
 
 # HTTP request metrics
